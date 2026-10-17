@@ -6,6 +6,9 @@
 <meta name="theme-color" content="#050a05">
 <title>BUCKSHOT ROULETTE IRL</title>
 
+<!-- Скрипт Telegram Mini Apps -->
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
 <link rel="manifest" href="manifest.json">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -402,6 +405,19 @@
 </div>
 
 <script>
+  // ── ИНИЦИАЛИЗАЦИЯ TELEGRAM MINI APP ──
+  if (window.Telegram && window.Telegram.WebApp) {
+    let tg = window.Telegram.WebApp;
+    tg.ready();                 // Сообщаем ТГ, что игра загружена
+    tg.expand();                // Разворачиваем на весь экран
+    
+    // Пытаемся включить полноэкранный режим и залочить ориентацию (с защитой от ошибок)
+    try { tg.requestFullscreen(); } catch(e) {}
+    try { tg.lockOrientation('landscape'); } catch(e) {}
+    try { tg.disableVerticalSwipes(); } catch(e) {}
+  }
+
+  // ── ЛОГИКА ПРИЛОЖЕНИЯ ──
   const BOLT_MAIN    = 'lightning.png';
   const BOLT_SPECIAL = 'lightning_special.png';
 
@@ -449,7 +465,6 @@
 
   closeBtn.addEventListener('click', closeHelp);
 
-  // Закрытие по клику вне окна
   window.addEventListener('click', (e) => {
     if (e.target === helpModal) {
       closeHelp();
@@ -477,22 +492,6 @@
   nameInput.addEventListener('keydown', e => {
     if (e.key === 'Enter') startGame();
   });
-
-  async function lockLandscape() {
-    try {
-      if (screen.orientation && screen.orientation.lock) {
-        await screen.orientation.lock('landscape');
-      }
-    } catch (e) {}
-  }
-
-  function unlockOrientation() {
-    try {
-      if (screen.orientation && screen.orientation.unlock) {
-        screen.orientation.unlock();
-      }
-    } catch (e) {}
-  }
 
   function makeBolt(isSpecial) {
     const img = document.createElement('img');
@@ -558,7 +557,12 @@
         resetBtn.style.display = 'block';
     }, 300); 
 
-    await lockLandscape();
+    // Блокировка ориентации для браузера (в ТГ это делается через API выше)
+    try {
+      if (screen.orientation && screen.orientation.lock) {
+        await screen.orientation.lock('landscape');
+      }
+    } catch (e) {}
   }
 
   resetBtn.onclick = () => {
@@ -570,7 +574,11 @@
         nameInput.value = '';
     }, 300);
 
-    unlockOrientation();
+    try {
+      if (screen.orientation && screen.orientation.unlock) {
+        screen.orientation.unlock();
+      }
+    } catch (e) {}
   };
 </script>
 </body>
