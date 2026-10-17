@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<meta name="theme-color" content="#050a05">
+<title>BUCKSHOT ROULETTE IRL</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<style>
+  @font-face {
+    font-family: 'Matricha';
+    src: url('https://fonts.cdnfonts.com/s/26611/matricha_.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* ── БАЗОВЫЕ СТИЛИ И ЦЕНТРОВКА ── */
+  * { margin:0; padding:0; box-sizing:border-box;
+      -webkit-tap-highlight-color:transparent;
+      user-select:none; -webkit-user-select:none; }
+
+  html, body { 
+    height:100%; width:100%;
+    background:#050a05;
+    font-family:'Matricha', 'Courier New', monospace;
+    overflow:hidden; color:#4eff7e; 
+    display: grid; 
+    place-items: center; 
+    animation: bgBreathe 8s infinite alternate ease-in-out;
+  }
+
+  button, input, textarea, select { font-family: inherit; }
+
+  /* Легкий эффект CRT-монитора (сканлайны) */
+  body::after {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 999;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+    background-size: 100% 4px, 3px 100%;
+    opacity: 0.6;
+  }
+
+  /* ── КЛЮЧЕВЫЕ КАДРЫ АНИМАЦИЙ ── */
+  @keyframes bgBreathe {
+    0% { background-color: #050a05; }
+    100% { background-color: #081208; }
+  }
+
+  @keyframes fadeUp {
+    0% { opacity: 0; transform: translateY(30px) scale(0.95); filter: blur(8px); }
+    100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+  }
+
+  @keyframes idlePulse {
+    0%, 100% { text-shadow: 0 0 10px #1f8a3d; opacity: 1; transform: scale(1); }
+    50% { text-shadow: 0 0 25px #4eff7e, 0 0 10px #4eff7e; opacity: 0.85; transform: scale(1.02); }
+  }
+
+  @keyframes glowPulse {
+    0%, 100% { filter: hue-rotate(35deg) saturate(1.8) brightness(1.35) drop-shadow(0 0 7px rgba(78,255,126, 0.25)); }
+    50% { filter: hue-rotate(35deg) saturate(1.8) brightness(1.35) drop-shadow(0 0 7px rgba(78,255,126, 0.95)); }
+  }
+
+  @keyframes deadPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .55; }
+  }
+
+  @keyframes inputPulse {
+    0% { box-shadow: 0 0 10px rgba(78,255,126,.2); border-color: #1f5a2a; }
+    100% { box-shadow: 0 0 20px rgba(78,255,126,.6); border-color: #4eff7e; }
+  }
+
+  @keyframes buttonShine {
+    0% { left: -100%; }
+    20% { left: 200%; }
+    100% { left: 200%; }
+  }
+
+  @keyframes nameIn {
+    0% { opacity: 0; transform: translateY(-40px) scale(1.1); letter-spacing: 15px; filter: blur(10px); }
+    100% { opacity: 1; transform: translateY(0) scale(1); letter-spacing: 4px; filter: blur(0); }
+  }
+
+  @keyframes lineStrike {
+    0% { transform: scaleX(0); transform-origin: left; }
+    100% { transform: scaleX(1); transform-origin: left; }
+  }
+
+  @keyframes modalIn {
+    0% { opacity: 0; transform: scale(0.9); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  /* ── ЭКРАН НАСТРОЙКИ ── */
+  #setup { 
+    display:flex; flex-direction:column; gap:16px;
+    align-items:center; padding:20px; width:100%; max-width:520px;
+    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 10;
+  }
+
+  /* Каскадное появление с размытием */
+  #setup > * { animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
+  #setup > *:nth-child(1) { animation-delay: 0.1s; }
+  #setup > *:nth-child(2) { animation-delay: 0.15s; }
+  #setup > *:nth-child(3) { animation-delay: 0.2s; }
+  #setup > *:nth-child(4) { animation-delay: 0.25s; }
+  #setup > *:nth-child(5) { animation-delay: 0.3s; }
+  #setup > *:nth-child(6) { animation-delay: 0.35s; }
+  #setup > *:nth-child(7) { animation-delay: 0.4s; }
+  #setup > *:nth-child(8) { animation-delay: 0.45s; }
+  #setup > *:nth-child(9) { animation-delay: 0.5s; }
+
+  #setup.hidden { opacity: 0; transform: scale(0.95) translateY(-10px); pointer-events: none; }
+
+  #setup h1 { font-size:26px; letter-spacing:4px; color:#4eff7e;
+      text-align:center; text-shadow:0 0 10px #1f8a3d; }
+  
+  .label { font-size:14px; letter-spacing:3px; color:#2a9d4a; align-self:flex-start; }
+  
+  #nameInput { 
+    background:#0c160c; border:2px solid #1f5a2a; color:#4eff7e; 
+    padding:14px; font-size:24px; text-align:center; width:100%; 
+    letter-spacing:2px; transition: all 0.3s; 
+  }
+  #nameInput::placeholder { color:#1f5a2a; }
+  #nameInput:focus { outline:none; animation: inputPulse 1.5s infinite alternate; }
+
+  #stagePick { display:flex; gap:10px; width:100%; align-items:stretch; }
+  
+  .stageBtn { 
+    flex:1; background:#0c160c; border:2px solid #1f5a2a; color:#2a9d4a; 
+    padding:12px 6px; font-size:34px; line-height:1; display:flex;
+    align-items:center; justify-content:center; cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); 
+  }
+  
+  @media (hover: hover) {
+    .stageBtn:hover { border-color:#4eff7e; color:#fff; transform: translateY(-2px); background:#112415; }
+  }
+  
+  .stageBtn.active { 
+    border-color:#4eff7e; color:#4eff7e; background:#0f2415; 
+    box-shadow: inset 0 0 15px rgba(78,255,126,0.1), 0 0 15px rgba(78,255,126,.3);
+    text-shadow:0 0 10px #4eff7e; 
+  }
+  
+  .stageBtn:active { transform:scale(0.9); }
+
+  .skullImg { width: 58px; height: 58px; object-fit: contain;
+      display: block; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  
+  .stageBtn.active .skullImg { filter: drop-shadow(0 0 8px #4eff7e); transform: scale(1.15) rotate(5deg); }
+
+  .livesPick { display:flex; align-items:center; gap:18px; color:#2a9d4a; font-size:16px; letter-spacing:2px; }
+  
+  .livesPick button { 
+    background:#0c160c; border:2px solid #1f5a2a; color:#4eff7e; 
+    width:44px; height:44px; font-size:24px; cursor: pointer;
+    transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+  }
+  
+  @media (hover: hover) {
+    .livesPick button:hover { border-color:#4eff7e; box-shadow: 0 0 10px rgba(78,255,126,0.3); }
+  }
+  
+  .livesPick button:active { background:#1f5a2a; transform: scale(0.85); }
+  #livesCount { font-size:28px; color:#4eff7e; min-width:40px; text-align:center; text-shadow:0 0 8px #1f8a3d; }
+
+  #startBtn { 
+    position: relative; overflow: hidden;
+    background:#0c160c; color:#4eff7e; border:2px solid #4eff7e; 
+    padding:16px 50px; font-size:24px; letter-spacing:4px; margin-top:6px; 
+    box-shadow:0 0 14px rgba(78,255,126,.2); cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Блик по кнопке */
+  #startBtn::before {
+    content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(78,255,126,0.4), transparent);
+    transform: skewX(-20deg); animation: buttonShine 4s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  @media (hover: hover) {
+    #startBtn:hover { background:#1f5a2a; box-shadow:0 0 25px rgba(78,255,126,.6); letter-spacing: 6px; }
+  }
+  
+  #startBtn:active { transform: scale(0.94); box-shadow:0 0 10px rgba(78,255,126,.8); }
+
+  /* Кнопка "ПОМОЩЬ" */
+  #helpBtn {
+    background: transparent; border: 1px dashed #2a9d4a; color: #2a9d4a;
+    padding: 8px 24px; font-size: 16px; letter-spacing: 2px; cursor: pointer;
+    margin-top: 10px; transition: all 0.3s;
+  }
+  #helpBtn:hover { border-color: #4eff7e; color: #4eff7e; background: rgba(78,255,126,0.05); }
+  #helpBtn:active { transform: scale(0.95); }
+
+  /* Эффект простоя (Idle) */
+  body.idle #startBtn { animation: idlePulse 2.5s infinite ease-in-out; }
+  body.idle #setup h1 { animation: idlePulse 3s infinite ease-in-out; }
+
+  /* ── ИГРОВОЙ ЭКРАН ── */
+  #game { 
+    display:flex; flex-direction:column; align-items:center; justify-content:center; 
+    height:100%; width:100%; padding:20px; gap:18px; 
+    position: absolute; top: 0; left: 0;
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transition: opacity 0.4s ease, visibility 0.4s ease; 
+  }
+  
+  #game.visible { opacity: 1; visibility: visible; pointer-events: auto; }
+
+  #deadLabel { font-size:56px; letter-spacing:10px; padding-left: 10px; color:#c1121f;
+      text-shadow:0 0 18px #c1121f, 0 0 40px #7a0000; display:none; margin-bottom: 6px; }
+  #deadLabel.show { display:block; animation: deadPulse 1s infinite; }
+
+  /* ── НИК ИГРОКА ── */
+  #playerName {
+      position: relative; display: inline-block; font-size:54px; letter-spacing:4px; 
+      padding-left: 4px; color:#4eff7e; text-align:center; word-break:break-word; 
+      line-height:1.15; max-width:95vw; text-shadow:0 0 10px #1f8a3d; 
+  }
+  
+  #playerName.dead { 
+      color: #808080; opacity: 0.85; text-shadow: none; 
+      transition: color 0.4s, opacity 0.4s, text-shadow 0.4s; 
+  }
+  
+  #playerName.dead::after {
+      content: ''; position: absolute; left: 4px; right: 0; top: 50%;
+      height: 6px; margin-top: -3px; background: #c1121f;
+      box-shadow: 0 0 8px #c1121f; pointer-events: none; 
+      animation: lineStrike 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; 
+  }
+
+  #playerNameWrap { display:flex; justify-content:center; width:100%; }
+  #lives { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:14px; max-width:95vw; margin-top: 16px; }
+
+  /* ── МОЛНИИ ── */
+  .life {
+      height: 90px; width: auto; display: block; cursor: pointer;
+      transform: scaleY(0.72); transform-origin: center center; margin: -13px 0;
+      transition: opacity .2s, filter .2s;
+      animation: glowPulse 3.2s ease-in-out infinite; 
+  }
+  .life:active { transform: scale(0.85) scaleY(0.72); opacity: .65; transition: transform 0.1s; }
+  .life.off { filter: grayscale(1) brightness(0.5); opacity:.28; animation: none; }
+  .life.special {
+      filter: hue-rotate(35deg) saturate(1.8) brightness(0.85) drop-shadow(0 0 4px rgba(78,255,126, 0.3));
+      transform: scaleY(0.72); transform-origin: center center; animation: none; 
+  }
+  .life.special:active { transform: scale(0.85) scaleY(0.72); opacity: .65; }
+  .life.special.spent { filter: grayscale(1) brightness(0.5); opacity:.22; cursor:default; animation: none; }
+  .life.special.spent:active { transform: scaleY(0.72); opacity:.22; }
+
+  #reset { position:fixed; bottom:18px; right:18px;
+      background:transparent; border:1px solid #1f5a2a; color:#2a9d4a; 
+      padding:8px 14px; font-size:14px; letter-spacing:2px;
+      transition: all 0.2s; cursor: pointer; z-index: 1000; }
+  #reset:hover { color: #4eff7e; border-color: #4eff7e; }
+  #reset:active { transform: scale(0.9); }
+
+  /* ── МОДАЛЬНОЕ ОКНО ПОМОЩИ ── */
+  .modal {
+    display: none; position: fixed; inset: 0; z-index: 2000;
+    background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal.active { display: flex; }
+  
+  .modal-content {
+    background: #0c160c; border: 2px solid #4eff7e;
+    padding: 24px; width: 100%; max-width: 500px; max-height: 85vh;
+    overflow-y: auto; position: relative;
+    box-shadow: 0 0 30px rgba(78,255,126,0.2);
+    animation: modalIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
+
+  .modal-content h2 {
+    color: #4eff7e; font-size: 24px; letter-spacing: 2px;
+    margin-bottom: 20px; text-align: center; text-shadow: 0 0 10px #1f8a3d;
+  }
+
+  .close-btn {
+    position: absolute; top: 12px; right: 12px;
+    color: #2a9d4a; cursor: pointer; padding: 4px;
+    transition: color 0.2s, transform 0.2s;
+  }
+  .close-btn:hover { color: #4eff7e; transform: scale(1.1); }
+
+  .help-text { color: #2a9d4a; font-size: 16px; line-height: 1.6; }
+  .help-text p { margin-bottom: 16px; }
+  .help-text b { color: #4eff7e; font-weight: normal; text-shadow: 0 0 5px rgba(78,255,126,0.5); }
+  .help-text ul { list-style: none; padding-left: 0; }
+  .help-text li { margin-bottom: 12px; display: flex; gap: 8px; }
+  .help-text li::before { content: '•'; color: #4eff7e; font-size: 20px; line-height: 1; }
+
+  /* ── АДАПТАЦИЯ ПОД ГОРИЗОНТАЛЬНУЮ ОРИЕНТАЦИЮ ── */
+  @media (orientation: landscape) {
+    #setup { gap: 10px; padding: 12px; max-width: 720px; }
+    #setup h1 { font-size: 20px; }
+    .label { font-size: 11px; }
+    #nameInput { padding: 8px; font-size: 18px; }
+    .stageBtn { padding: 6px 4px; font-size: 24px; }
+    .skullImg { width: 44px; height: 44px; }
+    .livesPick button { width: 36px; height: 36px; font-size: 20px; }
+    #livesCount { font-size: 22px; }
+    #startBtn { padding: 10px 36px; font-size: 18px; }
+    #helpBtn { margin-top: 4px; padding: 6px 20px; font-size: 14px; }
+
+    #game { gap: 10px; }
+    #deadLabel { font-size: 40px; letter-spacing: 6px; padding-left: 6px; margin-bottom: 0; }
+    #playerName { font-size: 42px; }
+    .life { height: 70px; margin: -10px 0; }
+    #lives { margin-top: 6px; gap: 12px; }
+
+    .modal-content { padding: 16px; max-width: 600px; }
+    .modal-content h2 { font-size: 20px; margin-bottom: 12px; }
+    .help-text { font-size: 14px; }
+    .help-text li { margin-bottom: 8px; }
+    .close-btn { top: 8px; right: 8px; width: 24px; height: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="setup">
+  <h1>BUCKSHOT ROULETTE</h1>
+
+  <span class="label">НИК ИГРОКА</span>
+  <input id="nameInput" type="text" placeholder="ВВЕДИ НИК" maxlength="14" autocomplete="off">
+
+  <span class="label">СТАДИЯ</span>
+  <div id="stagePick">
+    <button class="stageBtn" data-stage="1">I</button>
+    <button class="stageBtn" data-stage="2">II</button>
+    <button class="stageBtn" data-stage="3">
+      <img src="skull.png" alt="💀" class="skullImg">
+    </button>
+  </div>
+
+  <span class="label">ЖИЗНИ</span>
+  <div class="livesPick">
+    <button id="minus">−</button>
+    <span id="livesCount">4</span>
+    <button id="plus">+</button>
+  </div>
+
+  <button id="startBtn">НАЧАТЬ</button>
+  <button id="helpBtn">ПОМОЩЬ</button>
+</div>
+
+<div id="game">
+  <div id="deadLabel">МЕРТВ</div>
+  <div id="playerNameWrap"><div id="playerName"></div></div>
+  <div id="lives"></div>
+</div>
+
+<button id="reset" style="display:none">СБРОС</button>
+
+<!-- Модальное окно помощи -->
+<div id="helpModal" class="modal">
+  <div class="modal-content">
+    <svg class="close-btn" viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+    
+    <h2>СПРАВКА</h2>
+    <div class="help-text">
+      <p><b>СТАДИИ</b></p>
+      <ul>
+        <li>Стадии <b>I</b> и <b>II</b> — обычные уровни.</li>
+        <li>Стадия с <b>черепом</b> — финальная. На ней появляются особые молнии.</li>
+      </ul>
+      <p><b>ЖИЗНИ</b></p>
+      <ul>
+        <li>Кнопки <b>«−»</b> и <b>«+»</b> устанавливают стартовое количество жизней (от 1 до 8).</li>
+        <li>В игре каждая жизнь — это молния. Отнимать их нужно слева направо. Нажмите на молнию, чтобы потратить. Нажмите ещё раз, чтобы вернуть (кроме одноразовых жизней, на финальной стадии).</li>
+      </ul>
+      <p><b>ОДНОРАЗОВЫЕ МОЛНИИ</b></p>
+      <ul>
+        <li>На финальной стадии справа появляются <b>2 тёмные молнии</b>.</li>
+        <li>Они одноразовые: если нажать, молния гаснет навсегда и её нельзя вернуть.</li>
+      </ul>
+      <p><b>СМЕРТЬ</b></p>
+      <ul>
+        <li>Если погасить все молнии, игрок умирает.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  const BOLT_MAIN    = 'lightning.png';
+  const BOLT_SPECIAL = 'lightning_special.png';
+
+  const STAGES = { 1: { final:false }, 2: { final:false }, 3: { final:true } };
+
+  let livesCount = 4;
+  let currentStage = 1;
+
+  const livesCountEl  = document.getElementById('livesCount');
+  const nameInput     = document.getElementById('nameInput');
+  const setupEl       = document.getElementById('setup');
+  const gameEl        = document.getElementById('game');
+  const playerNameEl  = document.getElementById('playerName');
+  const livesEl       = document.getElementById('lives');
+  const deadLabelEl   = document.getElementById('deadLabel');
+  const resetBtn      = document.getElementById('reset');
+  const stageBtns     = document.querySelectorAll('.stageBtn');
+  
+  const helpBtn       = document.getElementById('helpBtn');
+  const helpModal     = document.getElementById('helpModal');
+  const closeBtn      = document.querySelector('.close-btn');
+
+  // ── IDLE СИСТЕМА ──
+  let idleTimer;
+  function resetIdleTimer() {
+    document.body.classList.remove('idle');
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => {
+      document.body.classList.add('idle');
+    }, 5000); 
+  }
+  window.addEventListener('mousemove', resetIdleTimer);
+  window.addEventListener('touchstart', resetIdleTimer);
+  window.addEventListener('keydown', resetIdleTimer);
+  resetIdleTimer();
+
+  // ── МОДАЛЬНОЕ ОКНО ПОМОЩИ ──
+  helpBtn.addEventListener('click', () => {
+    helpModal.classList.add('active');
+  });
+
+  function closeHelp() {
+    helpModal.classList.remove('active');
+  }
+
+  closeBtn.addEventListener('click', closeHelp);
+
+  // Закрытие по клику вне окна
+  window.addEventListener('click', (e) => {
+    if (e.target === helpModal) {
+      closeHelp();
+    }
+  });
+
+  // ── UI ЛОГИКА ──
+  stageBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      stageBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentStage = parseInt(btn.dataset.stage, 10);
+    });
+  });
+  stageBtns[0].classList.add('active');
+
+  document.getElementById('plus').onclick = () => {
+    if (livesCount < 8) { livesCount++; livesCountEl.textContent = livesCount; }
+  };
+  document.getElementById('minus').onclick = () => {
+    if (livesCount > 1) { livesCount--; livesCountEl.textContent = livesCount; }
+  };
+
+  document.getElementById('startBtn').onclick = startGame;
+  nameInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') startGame();
+  });
+
+  async function lockLandscape() {
+    try {
+      if (screen.orientation && screen.orientation.lock) {
+        await screen.orientation.lock('landscape');
+      }
+    } catch (e) {}
+  }
+
+  function unlockOrientation() {
+    try {
+      if (screen.orientation && screen.orientation.unlock) {
+        screen.orientation.unlock();
+      }
+    } catch (e) {}
+  }
+
+  function makeBolt(isSpecial) {
+    const img = document.createElement('img');
+    img.src = isSpecial ? BOLT_SPECIAL : BOLT_MAIN;
+    img.className = 'life' + (isSpecial ? ' special' : '');
+    return img;
+  }
+
+  function checkDeath() {
+    const all = livesEl.querySelectorAll('.life');
+    if (all.length === 0) return;
+    const dead = Array.from(all).every(el =>
+      el.classList.contains('off') || el.classList.contains('spent')
+    );
+    playerNameEl.classList.toggle('dead', dead);
+    deadLabelEl.classList.toggle('show', dead);
+  }
+
+  async function startGame() {
+    const name  = (nameInput.value.trim() || 'ИГРОК').toUpperCase();
+    const stage = STAGES[currentStage];
+
+    playerNameEl.textContent = name;
+    playerNameEl.classList.remove('dead');
+    deadLabelEl.classList.remove('show');
+
+    // Анимация появления ника
+    playerNameEl.style.animation = 'none';
+    playerNameEl.offsetHeight; 
+    playerNameEl.style.animation = 'nameIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards';
+
+    livesEl.innerHTML = '';
+    for (let i = 0; i < livesCount; i++) {
+      const el = makeBolt(false);
+      el.addEventListener('click', () => {
+        el.classList.toggle('off');
+        checkDeath();
+      });
+      livesEl.appendChild(el);
+    }
+
+    if (stage.final) {
+      const group = document.createElement('div');
+      group.className = 'specialGroup';
+      group.style.display = 'flex';
+      group.style.gap = '14px';
+      for (let i = 0; i < 2; i++) {
+        const el = makeBolt(true);
+        el.addEventListener('click', () => {
+          el.classList.add('spent');
+          checkDeath();
+        }, { once:true });
+        group.appendChild(el);
+      }
+      livesEl.appendChild(group);
+    }
+
+    // Плавная смена экранов
+    setupEl.classList.add('hidden');
+    
+    setTimeout(() => {
+        gameEl.classList.add('visible');
+        resetBtn.style.display = 'block';
+    }, 300); 
+
+    await lockLandscape();
+  }
+
+  resetBtn.onclick = () => {
+    gameEl.classList.remove('visible');
+    
+    setTimeout(() => {
+        setupEl.classList.remove('hidden');
+        resetBtn.style.display = 'none';
+        nameInput.value = '';
+    }, 300);
+
+    unlockOrientation();
+  };
+</script>
+</body>
+</html>
