@@ -2,11 +2,11 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 <meta name="theme-color" content="#050a05">
 <title>BUCKSHOT ROULETTE IRL</title>
 
-<!-- Скрипт Telegram Mini Apps -->
+<!-- Скрипт Telegram -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
@@ -18,7 +18,7 @@
     font-display: swap;
   }
 
-  /* ── БАЗОВЫЕ СТИЛИ И ЦЕНТРОВКА ── */
+  /* ── БАЗОВЫЕ СТИЛИ ── */
   * { margin:0; padding:0; box-sizing:border-box;
       -webkit-tap-highlight-color:transparent;
       user-select:none; -webkit-user-select:none; }
@@ -30,12 +30,11 @@
     overflow:hidden; color:#4eff7e; 
     display: grid; 
     place-items: center; 
-    animation: bgBreathe 8s infinite alternate ease-in-out;
   }
 
   button, input, textarea, select { font-family: inherit; }
 
-  /* Легкий эффект CRT-монитора (сканлайны) */
+  /* CRT-эффект */
   body::after {
     content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 999;
     background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
@@ -44,12 +43,7 @@
     opacity: 0.6;
   }
 
-  /* ── КЛЮЧЕВЫЕ КАДРЫ АНИМАЦИЙ ── */
-  @keyframes bgBreathe {
-    0% { background-color: #050a05; }
-    100% { background-color: #081208; }
-  }
-
+  /* ── АНИМАЦИИ ── */
   @keyframes fadeUp {
     0% { opacity: 0; transform: translateY(30px) scale(0.95); filter: blur(8px); }
     100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
@@ -68,17 +62,6 @@
   @keyframes deadPulse {
     0%, 100% { opacity: 1; }
     50% { opacity: .55; }
-  }
-
-  @keyframes inputPulse {
-    0% { box-shadow: 0 0 10px rgba(78,255,126,.2); border-color: #1f5a2a; }
-    100% { box-shadow: 0 0 20px rgba(78,255,126,.6); border-color: #4eff7e; }
-  }
-
-  @keyframes buttonShine {
-    0% { left: -100%; }
-    20% { left: 200%; }
-    100% { left: 200%; }
   }
 
   @keyframes nameIn {
@@ -100,8 +83,7 @@
   #setup { 
     display:flex; flex-direction:column; gap:16px;
     align-items:center; padding:20px; width:100%; max-width:520px;
-    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
-                transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: opacity 0.4s, transform 0.4s;
     z-index: 10;
   }
 
@@ -129,7 +111,7 @@
     letter-spacing:2px; transition: all 0.3s; 
   }
   #nameInput::placeholder { color:#1f5a2a; }
-  #nameInput:focus { outline:none; animation: inputPulse 1.5s infinite alternate; }
+  #nameInput:focus { outline:none; border-color: #4eff7e; box-shadow:0 0 10px rgba(78,255,126,.2); }
 
   #stagePick { display:flex; gap:10px; width:100%; align-items:stretch; }
   
@@ -137,11 +119,7 @@
     flex:1; background:#0c160c; border:2px solid #1f5a2a; color:#2a9d4a; 
     padding:12px 6px; font-size:34px; line-height:1; display:flex;
     align-items:center; justify-content:center; cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); 
-  }
-  
-  @media (hover: hover) {
-    .stageBtn:hover { border-color:#4eff7e; color:#fff; transform: translateY(-2px); background:#112415; }
+    transition: all 0.25s; 
   }
   
   .stageBtn.active { 
@@ -152,10 +130,8 @@
   
   .stageBtn:active { transform:scale(0.9); }
 
-  .skullImg { width: 58px; height: 58px; object-fit: contain;
-      display: block; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-  
-  .stageBtn.active .skullImg { filter: drop-shadow(0 0 8px #4eff7e); transform: scale(1.15) rotate(5deg); }
+  .skullImg { width: 58px; height: 58px; object-fit: contain; display: block; }
+  .stageBtn.active .skullImg { filter: drop-shadow(0 0 8px #4eff7e); transform: scale(1.15); }
 
   .livesPick { display:flex; align-items:center; gap:18px; color:#2a9d4a; font-size:16px; letter-spacing:2px; }
   
@@ -163,10 +139,6 @@
     background:#0c160c; border:2px solid #1f5a2a; color:#4eff7e; 
     width:44px; height:44px; font-size:24px; cursor: pointer;
     transition: all 0.2s; display: flex; align-items: center; justify-content: center;
-  }
-  
-  @media (hover: hover) {
-    .livesPick button:hover { border-color:#4eff7e; box-shadow: 0 0 10px rgba(78,255,126,0.3); }
   }
   
   .livesPick button:active { background:#1f5a2a; transform: scale(0.85); }
@@ -177,17 +149,7 @@
     background:#0c160c; color:#4eff7e; border:2px solid #4eff7e; 
     padding:16px 50px; font-size:24px; letter-spacing:4px; margin-top:6px; 
     box-shadow:0 0 14px rgba(78,255,126,.2); cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  #startBtn::before {
-    content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(78,255,126,0.4), transparent);
-    transform: skewX(-20deg); animation: buttonShine 4s infinite cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  @media (hover: hover) {
-    #startBtn:hover { background:#1f5a2a; box-shadow:0 0 25px rgba(78,255,126,.6); letter-spacing: 6px; }
+    transition: all 0.3s;
   }
   
   #startBtn:active { transform: scale(0.94); box-shadow:0 0 10px rgba(78,255,126,.8); }
@@ -197,9 +159,9 @@
     padding: 8px 24px; font-size: 16px; letter-spacing: 2px; cursor: pointer;
     margin-top: 10px; transition: all 0.3s;
   }
-  #helpBtn:hover { border-color: #4eff7e; color: #4eff7e; background: rgba(78,255,126,0.05); }
   #helpBtn:active { transform: scale(0.95); }
 
+  /* Эффект простоя (Idle) */
   body.idle #startBtn { animation: idlePulse 2.5s infinite ease-in-out; }
   body.idle #setup h1 { animation: idlePulse 3s infinite ease-in-out; }
 
@@ -218,6 +180,7 @@
       text-shadow:0 0 18px #c1121f, 0 0 40px #7a0000; display:none; margin-bottom: 6px; }
   #deadLabel.show { display:block; animation: deadPulse 1s infinite; }
 
+  /* ── НИК ИГРОКА ── */
   #playerName {
       position: relative; display: inline-block; font-size:54px; letter-spacing:4px; 
       padding-left: 4px; color:#4eff7e; text-align:center; word-break:break-word; 
@@ -233,20 +196,22 @@
       content: ''; position: absolute; left: 4px; right: 0; top: 50%;
       height: 6px; margin-top: -3px; background: #c1121f;
       box-shadow: 0 0 8px #c1121f; pointer-events: none; 
-      animation: lineStrike 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; 
+      animation: lineStrike 0.3s forwards; 
   }
 
   #playerNameWrap { display:flex; justify-content:center; width:100%; }
   #lives { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:14px; max-width:95vw; margin-top: 16px; }
 
+  /* ── МОЛНИИ ── */
   .life {
       height: 90px; width: auto; display: block; cursor: pointer;
       transform: scaleY(0.72); transform-origin: center center; margin: -13px 0;
       transition: opacity .2s, filter .2s;
       animation: glowPulse 3.2s ease-in-out infinite; 
   }
-  .life:active { transform: scale(0.85) scaleY(0.72); opacity: .65; transition: transform 0.1s; }
+  .life:active { transform: scale(0.85) scaleY(0.72); opacity: .65; }
   .life.off { filter: grayscale(1) brightness(0.5); opacity:.28; animation: none; }
+  
   .life.special {
       filter: hue-rotate(35deg) saturate(1.8) brightness(0.85) drop-shadow(0 0 4px rgba(78,255,126, 0.3));
       transform: scaleY(0.72); transform-origin: center center; animation: none; 
@@ -257,11 +222,10 @@
 
   #reset { position:fixed; bottom:18px; right:18px;
       background:transparent; border:1px solid #1f5a2a; color:#2a9d4a; 
-      padding:8px 14px; font-size:14px; letter-spacing:2px;
-      transition: all 0.2s; cursor: pointer; z-index: 1000; }
-  #reset:hover { color: #4eff7e; border-color: #4eff7e; }
+      padding:8px 14px; font-size:14px; letter-spacing:2px; cursor: pointer; z-index: 1000; }
   #reset:active { transform: scale(0.9); }
 
+  /* ── ОКНО ПОМОЩИ ── */
   .modal {
     display: none; position: fixed; inset: 0; z-index: 2000;
     background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(4px);
@@ -274,28 +238,22 @@
     padding: 24px; width: 100%; max-width: 500px; max-height: 85vh;
     overflow-y: auto; position: relative;
     box-shadow: 0 0 30px rgba(78,255,126,0.2);
-    animation: modalIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    animation: modalIn 0.3s forwards;
   }
 
-  .modal-content h2 {
-    color: #4eff7e; font-size: 24px; letter-spacing: 2px;
-    margin-bottom: 20px; text-align: center; text-shadow: 0 0 10px #1f8a3d;
-  }
+  .modal-content h2 { color: #4eff7e; font-size: 24px; letter-spacing: 2px; margin-bottom: 20px; text-align: center; }
 
-  .close-btn {
-    position: absolute; top: 12px; right: 12px;
-    color: #2a9d4a; cursor: pointer; padding: 4px;
-    transition: color 0.2s, transform 0.2s;
-  }
-  .close-btn:hover { color: #4eff7e; transform: scale(1.1); }
+  .close-btn { position: absolute; top: 12px; right: 12px; color: #2a9d4a; cursor: pointer; padding: 4px; }
+  .close-btn:active { color: #4eff7e; transform: scale(1.1); }
 
   .help-text { color: #2a9d4a; font-size: 16px; line-height: 1.6; }
   .help-text p { margin-bottom: 16px; }
-  .help-text b { color: #4eff7e; font-weight: normal; text-shadow: 0 0 5px rgba(78,255,126,0.5); }
+  .help-text b { color: #4eff7e; font-weight: normal; }
   .help-text ul { list-style: none; padding-left: 0; }
   .help-text li { margin-bottom: 12px; display: flex; gap: 8px; }
   .help-text li::before { content: '•'; color: #4eff7e; font-size: 20px; line-height: 1; }
 
+  /* ── АДАПТАЦИЯ ПОД ГОРИЗОНТАЛЬНУЮ ОРИЕНТАЦИЮ ── */
   @media (orientation: landscape) {
     #setup { gap: 10px; padding: 12px; max-width: 720px; }
     #setup h1 { font-size: 20px; }
@@ -392,20 +350,11 @@
 </div>
 
 <script>
-  // ── ИНИЦИАЛИЗАЦИЯ TELEGRAM MINI APP ──
+  // Инициализация Telegram
   if (window.Telegram && window.Telegram.WebApp) {
     let tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
-
-    // Включаем полноэкранный режим для скрытия шапки Telegram (Bot API 8.0+)
-    if (tg.isVersionAtLeast('8.0')) {
-      try {
-        tg.requestFullscreen(); 
-        tg.lockOrientation('landscape');
-        tg.disableVerticalSwipes();
-      } catch(e) {}
-    }
   }
 
   // ── ЛОГИКА ПРИЛОЖЕНИЯ ──
@@ -431,7 +380,7 @@
   const helpModal     = document.getElementById('helpModal');
   const closeBtn      = document.querySelector('.close-btn');
 
-  // ── IDLE СИСТЕМА ──
+  // IDLE
   let idleTimer;
   function resetIdleTimer() {
     document.body.classList.remove('idle');
@@ -445,30 +394,28 @@
   window.addEventListener('keydown', resetIdleTimer);
   resetIdleTimer();
 
-  // ── МОДАЛЬНОЕ ОКНО ПОМОЩИ ──
-  helpBtn.addEventListener('click', () => {
+  // ПОМОЩЬ
+  helpBtn.onclick = () => {
     helpModal.classList.add('active');
-  });
+  };
 
-  function closeHelp() {
+  closeBtn.onclick = () => {
     helpModal.classList.remove('active');
-  }
+  };
 
-  closeBtn.addEventListener('click', closeHelp);
-
-  window.addEventListener('click', (e) => {
+  helpModal.onclick = (e) => {
     if (e.target === helpModal) {
-      closeHelp();
+      helpModal.classList.remove('active');
     }
-  });
+  };
 
-  // ── UI ЛОГИКА ──
+  // UI
   stageBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.onclick = () => {
       stageBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       currentStage = parseInt(btn.dataset.stage, 10);
-    });
+    };
   });
   stageBtns[0].classList.add('active');
 
@@ -480,9 +427,9 @@
   };
 
   document.getElementById('startBtn').onclick = startGame;
-  nameInput.addEventListener('keydown', e => {
+  nameInput.onkeydown = (e) => {
     if (e.key === 'Enter') startGame();
-  });
+  };
 
   function makeBolt(isSpecial) {
     const img = document.createElement('img');
@@ -501,7 +448,7 @@
     deadLabelEl.classList.toggle('show', dead);
   }
 
-  async function startGame() {
+  function startGame() {
     const name  = (nameInput.value.trim() || 'ИГРОК').toUpperCase();
     const stage = STAGES[currentStage];
 
@@ -509,18 +456,18 @@
     playerNameEl.classList.remove('dead');
     deadLabelEl.classList.remove('show');
 
-    // Анимация появления ника
+    // Сброс анимации
     playerNameEl.style.animation = 'none';
     playerNameEl.offsetHeight; 
-    playerNameEl.style.animation = 'nameIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards';
+    playerNameEl.style.animation = 'nameIn 0.8s forwards';
 
     livesEl.innerHTML = '';
     for (let i = 0; i < livesCount; i++) {
       const el = makeBolt(false);
-      el.addEventListener('click', () => {
+      el.onclick = () => {
         el.classList.toggle('off');
         checkDeath();
-      });
+      };
       livesEl.appendChild(el);
     }
 
@@ -531,44 +478,29 @@
       group.style.gap = '14px';
       for (let i = 0; i < 2; i++) {
         const el = makeBolt(true);
-        el.addEventListener('click', () => {
+        el.onclick = () => {
           el.classList.add('spent');
           checkDeath();
-        }, { once:true });
+        };
         group.appendChild(el);
       }
       livesEl.appendChild(group);
     }
 
-    // Плавная смена экранов
     setupEl.classList.add('hidden');
-    
     setTimeout(() => {
         gameEl.classList.add('visible');
         resetBtn.style.display = 'block';
-    }, 300); 
-
-    try {
-      if (screen.orientation && screen.orientation.lock) {
-        await screen.orientation.lock('landscape');
-      }
-    } catch (e) {}
+    }, 300);
   }
 
   resetBtn.onclick = () => {
     gameEl.classList.remove('visible');
-    
     setTimeout(() => {
         setupEl.classList.remove('hidden');
         resetBtn.style.display = 'none';
         nameInput.value = '';
     }, 300);
-
-    try {
-      if (screen.orientation && screen.orientation.unlock) {
-        screen.orientation.unlock();
-      }
-    } catch (e) {}
   };
 </script>
 </body>
