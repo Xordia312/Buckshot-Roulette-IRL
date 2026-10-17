@@ -9,11 +9,6 @@
 <!-- Скрипт Telegram Mini Apps -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-<link rel="manifest" href="manifest.json">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
 <style>
   @font-face {
     font-family: 'Matricha';
@@ -110,7 +105,6 @@
     z-index: 10;
   }
 
-  /* Каскадное появление с размытием */
   #setup > * { animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
   #setup > *:nth-child(1) { animation-delay: 0.1s; }
   #setup > *:nth-child(2) { animation-delay: 0.15s; }
@@ -186,7 +180,6 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
-  /* Блик по кнопке */
   #startBtn::before {
     content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
     background: linear-gradient(90deg, transparent, rgba(78,255,126,0.4), transparent);
@@ -199,7 +192,6 @@
   
   #startBtn:active { transform: scale(0.94); box-shadow:0 0 10px rgba(78,255,126,.8); }
 
-  /* Кнопка "ПОМОЩЬ" */
   #helpBtn {
     background: transparent; border: 1px dashed #2a9d4a; color: #2a9d4a;
     padding: 8px 24px; font-size: 16px; letter-spacing: 2px; cursor: pointer;
@@ -208,7 +200,6 @@
   #helpBtn:hover { border-color: #4eff7e; color: #4eff7e; background: rgba(78,255,126,0.05); }
   #helpBtn:active { transform: scale(0.95); }
 
-  /* Эффект простоя (Idle) */
   body.idle #startBtn { animation: idlePulse 2.5s infinite ease-in-out; }
   body.idle #setup h1 { animation: idlePulse 3s infinite ease-in-out; }
 
@@ -219,27 +210,14 @@
     position: absolute; top: 0; left: 0;
     opacity: 0; visibility: hidden; pointer-events: none;
     transition: opacity 0.4s ease, visibility 0.4s ease; 
-    /* Масштабирование через CSS переменную */
-    --game-scale: 1;
   }
   
   #game.visible { opacity: 1; visibility: visible; pointer-events: auto; }
-
-  /* Оборачиваем контент в отдельный блок для масштабирования */
-  #game-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transform: scale(var(--game-scale));
-    transition: transform 0.3s ease;
-    gap: 18px;
-  }
 
   #deadLabel { font-size:56px; letter-spacing:10px; padding-left: 10px; color:#c1121f;
       text-shadow:0 0 18px #c1121f, 0 0 40px #7a0000; display:none; margin-bottom: 6px; }
   #deadLabel.show { display:block; animation: deadPulse 1s infinite; }
 
-  /* ── НИК ИГРОКА ── */
   #playerName {
       position: relative; display: inline-block; font-size:54px; letter-spacing:4px; 
       padding-left: 4px; color:#4eff7e; text-align:center; word-break:break-word; 
@@ -261,7 +239,6 @@
   #playerNameWrap { display:flex; justify-content:center; width:100%; }
   #lives { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:14px; max-width:95vw; margin-top: 16px; }
 
-  /* ── МОЛНИИ ── */
   .life {
       height: 90px; width: auto; display: block; cursor: pointer;
       transform: scaleY(0.72); transform-origin: center center; margin: -13px 0;
@@ -278,32 +255,13 @@
   .life.special.spent { filter: grayscale(1) brightness(0.5); opacity:.22; cursor:default; animation: none; }
   .life.special.spent:active { transform: scaleY(0.72); opacity:.22; }
 
-  /* ── ЗУМ-КОНТРОЛ ── */
-  #zoom-controls {
-    position: fixed; bottom: 18px; right: 18px;
-    display: none; flex-direction: column; gap: 10px; z-index: 1000;
-  }
-  #zoom-controls.visible { display: flex; }
-  
-  .zoom-btn {
-    background: transparent; border: 1px solid #1f5a2a; color: #2a9d4a;
-    width: 44px; height: 44px; font-size: 24px; display: flex;
-    align-items: center; justify-content: center; cursor: pointer;
-    transition: all 0.2s; font-family: sans-serif;
-  }
-  .zoom-btn:hover { color: #4eff7e; border-color: #4eff7e; background: rgba(78,255,126,0.05); }
-  .zoom-btn:active { transform: scale(0.9); }
-
-  #reset { 
-    position:fixed; bottom:18px; left:18px;
-    background:transparent; border:1px solid #1f5a2a; color:#2a9d4a; 
-    padding:8px 14px; font-size:14px; letter-spacing:2px;
-    transition: all 0.2s; cursor: pointer; z-index: 1000; 
-  }
+  #reset { position:fixed; bottom:18px; right:18px;
+      background:transparent; border:1px solid #1f5a2a; color:#2a9d4a; 
+      padding:8px 14px; font-size:14px; letter-spacing:2px;
+      transition: all 0.2s; cursor: pointer; z-index: 1000; }
   #reset:hover { color: #4eff7e; border-color: #4eff7e; }
   #reset:active { transform: scale(0.9); }
 
-  /* ── МОДАЛЬНОЕ ОКНО ПОМОЩИ ── */
   .modal {
     display: none; position: fixed; inset: 0; z-index: 2000;
     background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(4px);
@@ -338,7 +296,6 @@
   .help-text li { margin-bottom: 12px; display: flex; gap: 8px; }
   .help-text li::before { content: '•'; color: #4eff7e; font-size: 20px; line-height: 1; }
 
-  /* ── АДАПТАЦИЯ ПОД ГОРИЗОНТАЛЬНУЮ ОРИЕНТАЦИЮ ── */
   @media (orientation: landscape) {
     #setup { gap: 10px; padding: 12px; max-width: 720px; }
     #setup h1 { font-size: 20px; }
@@ -351,7 +308,7 @@
     #startBtn { padding: 10px 36px; font-size: 18px; }
     #helpBtn { margin-top: 4px; padding: 6px 20px; font-size: 14px; }
 
-    #game-content { gap: 10px; }
+    #game { gap: 10px; }
     #deadLabel { font-size: 40px; letter-spacing: 6px; padding-left: 6px; margin-bottom: 0; }
     #playerName { font-size: 42px; }
     .life { height: 70px; margin: -10px 0; }
@@ -394,17 +351,9 @@
 </div>
 
 <div id="game">
-  <div id="game-content">
-    <div id="deadLabel">МЕРТВ</div>
-    <div id="playerNameWrap"><div id="playerName"></div></div>
-    <div id="lives"></div>
-  </div>
-</div>
-
-<!-- Управление зумом (появляется только в игре) -->
-<div id="zoom-controls">
-  <button class="zoom-btn" id="zoom-in">+</button>
-  <button class="zoom-btn" id="zoom-out">−</button>
+  <div id="deadLabel">МЕРТВ</div>
+  <div id="playerNameWrap"><div id="playerName"></div></div>
+  <div id="lives"></div>
 </div>
 
 <button id="reset" style="display:none">СБРОС</button>
@@ -449,7 +398,7 @@
     tg.ready();
     tg.expand();
 
-    // Включаем полноэкранный режим для скрытия шапки Telegram
+    // Включаем полноэкранный режим для скрытия шапки Telegram (Bot API 8.0+)
     if (tg.isVersionAtLeast('8.0')) {
       try {
         tg.requestFullscreen(); 
@@ -472,7 +421,6 @@
   const nameInput     = document.getElementById('nameInput');
   const setupEl       = document.getElementById('setup');
   const gameEl        = document.getElementById('game');
-  const gameContentEl = document.getElementById('game-content');
   const playerNameEl  = document.getElementById('playerName');
   const livesEl       = document.getElementById('lives');
   const deadLabelEl   = document.getElementById('deadLabel');
@@ -482,27 +430,6 @@
   const helpBtn       = document.getElementById('helpBtn');
   const helpModal     = document.getElementById('helpModal');
   const closeBtn      = document.querySelector('.close-btn');
-
-  const zoomInBtn     = document.getElementById('zoom-in');
-  const zoomOutBtn    = document.getElementById('zoom-out');
-  const zoomControls  = document.getElementById('zoom-controls');
-
-  let currentScale = 1;
-
-  // ── УПРАВЛЕНИЕ МАСШТАБОМ ──
-  zoomInBtn.addEventListener('click', () => {
-    if (currentScale < 2.5) {
-      currentScale += 0.15;
-      gameContentEl.style.setProperty('--game-scale', currentScale);
-    }
-  });
-
-  zoomOutBtn.addEventListener('click', () => {
-    if (currentScale > 0.5) {
-      currentScale -= 0.15;
-      gameContentEl.style.setProperty('--game-scale', currentScale);
-    }
-  });
 
   // ── IDLE СИСТЕМА ──
   let idleTimer;
@@ -582,10 +509,6 @@
     playerNameEl.classList.remove('dead');
     deadLabelEl.classList.remove('show');
 
-    // Сброс масштаба перед новой игрой
-    currentScale = 1;
-    gameContentEl.style.setProperty('--game-scale', currentScale);
-
     // Анимация появления ника
     playerNameEl.style.animation = 'none';
     playerNameEl.offsetHeight; 
@@ -623,7 +546,6 @@
     setTimeout(() => {
         gameEl.classList.add('visible');
         resetBtn.style.display = 'block';
-        zoomControls.classList.add('visible'); // Показываем кнопки зума
     }, 300); 
 
     try {
@@ -635,8 +557,19 @@
 
   resetBtn.onclick = () => {
     gameEl.classList.remove('visible');
-    zoomControls.classList.remove('visible');
     
     setTimeout(() => {
         setupEl.classList.remove('hidden');
-        resetBtn
+        resetBtn.style.display = 'none';
+        nameInput.value = '';
+    }, 300);
+
+    try {
+      if (screen.orientation && screen.orientation.unlock) {
+        screen.orientation.unlock();
+      }
+    } catch (e) {}
+  };
+</script>
+</body>
+</html>
